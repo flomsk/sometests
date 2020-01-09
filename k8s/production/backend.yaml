@@ -1,0 +1,40 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: testapp-backend-production
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: backend
+      labels:
+        app: testapp
+        role: backend
+        env: production
+    spec:
+      containers:
+      - name: backend
+        image: 749310277795.dkr.ecr.us-east-1.amazonaws.com/testapp:1.0.0
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "100m"
+        imagePullPolicy: Always
+        ports:
+        - name: backend
+          containerPort: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: testapp-backend
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    role: backend
+    app: testapp

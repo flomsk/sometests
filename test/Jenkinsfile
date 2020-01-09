@@ -1,0 +1,79 @@
+pipeline {
+
+  environment {
+    ECRPASS = credentials('ecrpass')
+    KUBECONF = credentials('kopsconfig')
+    APP_NAME = "testapp"
+    IMAGE_TAG = "749310277795.dkr.ecr.us-east-1.amazonaws.com/testapp:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+  }
+
+  agent {
+    kubernetes {
+      label 'sample-app'
+      defaultContainer 'jnlp'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+labels:
+  component: ci
+spec:
+  # Use service account that can deploy to all namespaces
+  serviceAccountName: tiller
+  containers:
+  - name: npm
+    image: node:10
+    command:
+    - cat
+    tty: true
+  - name: docker
+    image: docker:latest
+    command:
+    - cat
+    tty: true
+  - name: kubectl
+    image: dtzar/helm-kubectl:2.16.1
+    command:
+    - cat
+    tty: true
+"""
+}
+  }
+  stages {
+    stage('Install') {
+      steps {
+        container('npm') {
+          sh """
+            npm install
+          """
+        }
+      }
+    }
+    stage('Build') {
+      steps {
+        container('docker') {
+          sh """
+            docker login -u AWS -p eyJwYXlsb2FkIjoiWFhOeU56WmFEQXR3MyswaXVWZVhwNDlPcjlWekpQS2RTblBabHNWWmN5REJkS2p1enAyT1laQ3JuckVDZS91SitFRnJoUzZQMkVNQ2VqanNtS2hKbkk0SWJBRkhDei82TjdOWWI2U3dYSmp5VGdhYjFLMjc4MVNPK1lBOW9yTUVhMUJqSmdEME50NVc5MVQ2VFVrNEN0SGcvSmJHZnpQKzhiSlRudld0cC9tcnYyeThFYjk3NHVHRXNrVU1GdmJIUi9ySU9lZ1JxVXkrRWp6Ym5aVlhmczZ4TytLcVQvNlFuT1E1V3NFUG9EYnNZMy9uRyttYktZSFhLWVVqdWgrS0lEN3RaUis5b2hPanpDTG5sYWRtOWxoVTJ6SjJZcFQ1KytjUzcwYnE1N2l1VUUzaGlucVorQ3EwZ3kxV0xZQVIvMnUrc211NzQ4dTRBRmREbHl4QU1GdDRTNGVWeFA1bkg4cURIeU9KeGFZN1RHTXJwUDNNMnRYM3NBblN2NGVJNUhLR05HbDg0dmtTWlMvcWRYYjUwYkJ6N1p0L3dIdTZjRTBIdVdWZVg2dWJ6cGJtNktpNU9vZkt6QVFjZHFITkxLSVlabThtSDZUbFZMc0NpbWd6YjZHOEIyUjJ6V2J6b1VMRVdncFZjWkpESGc0dU9oOHBUTE1nKzhtNVV5SUxUaHJDUEtoUHdzYU45NHZEY01VZTlYaUNXSG1zNE9EZktEelQxSXowbkQyc0ROSnVjTVZ4MEZiTXM0TkFJRVMzM3UxYVA4QmFaSkdUNGJjbUV0TVl5LzhnV1BXU2FxZy9FOGZKTXFGRlowMU9TeVJCVUpDS3ZxZmpjdDE1WG4ybGl2UnQxRTJOOUI3WXZOZ2xtVlg1Ylc3S0JCd21QdldrWm1OYlhMOHJIM3RybXFBVDVGMzVqRHFQRkhSbm5wZ1dsMWRPTytHbndUY1h4RU9DUXp2eTVYd2lHWkRFSGIxSlJ0WEFoQjNLTTdRQzRLODJVV21qaVVrUVZnZTF3R1Zwb2p5ZDlrYjBUMnFZUHNSeFBEdTRFWmVnc3l6amczWk05V29FUHF3cU14MzlXV3ZKTThXN0UzOC9qSCs3Tmd3ZmJnZVFJQmp1eHllcWVsQmpaR0p3MHhvWUVTN1g4M2lnbzRtZG9NQjZCNFA3TURuaVY5U0VkVDF1bkk5RlFxK2xsdDFwTFFwQnZpWlR4MUdTQjJCb01DKzZMakx2TGI0ZkdZSjVBbEpwM3BMUTQ3NUpiWmNDY3hrblk0endqaFgxQW9CWVZWYmxvdXg4dmlkblV2RmZGUWF2OEgvODFMbmRjQUtobTBXYk9Jck5hTGsyck1qVGsvUDRnNmhLak1CcEJqcXpIRU9FYVh4bnRnclgzUU1IZ2ZjWFlabzNJSEFjNFZ0aldSa2x4ZkVtT2lsc1piTjhmM0FMVzZqcFF4cW5ITFpTRHljTnpXMmVzeDVTOEJYNkYxOUVxNGlPYnc9PSIsImRhdGFrZXkiOiJBUUVCQUhod20wWWFJU0plUnRKbTVuMUc2dXFlZWtYdW9YWFBlNVVGY2U5UnE4LzE0d0FBQUg0d2ZBWUpLb1pJaHZjTkFRY0dvRzh3YlFJQkFEQm9CZ2txaGtpRzl3MEJCd0V3SGdZSllJWklBV1VEQkFFdU1CRUVESFpERHA4N3FsSlBjYUVqVlFJQkVJQTdPbXpyUzZLV3FqeVVPb2ZlcXpsV1Y1NmxpS0o2ZjRUQThlK1FyVGJwcDhpK05ERkJMWlBKZTUyb1B4anQ0Y050UTh1RmxxaUVraURBT3JzPSIsInZlcnNpb24iOiIyIiwidHlwZSI6IkRBVEFfS0VZIiwiZXhwaXJhdGlvbiI6MTU3ODYwNzA5OH0= -e none https://749310277795.dkr.ecr.us-east-1.amazonaws.com
+            docker build -t ${IMAGE_TAG} .
+            docker push ${IMAGE_TAG}
+          """
+        }
+      }
+    }
+    stage('Deploy') {
+      // Production branch
+      when { branch 'master' }
+      withKubeConfig([credentialsId: 'kopsconfig', serverUrl: 'https://api-olegscluster-k8s-loca-bn9akp-2123449763.us-east-1.elb.amazonaws.com'])
+      steps{
+        container('kubectl') {
+        // Change deployed image in canary to the one we just built
+          sh """
+            sed -i.bak 's#749310277795.dkr.ecr.us-east-1.amazonaws.com/testapp:1.0.0#${IMAGE_TAG}#' ./k8s/production/backend.yaml
+            cat $KUBECONF > kubeconfig
+            export KUBECONFIG=kubeconfig
+            kubectl apply -f ./k8s/production/backend.yaml
+        }
+      }
+    }
+  }
+}
