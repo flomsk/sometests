@@ -1,0 +1,14 @@
+PASS: ENC[AES256_GCM,data:VkS9,iv:CoBYNAEIGgT3dI0rSZ46dyQkIvf0LiIvWM7NNOuKCkI=,tag:9yPROUTWnQoEHuCrXCc/XQ==,type:str]
+LOGIN: ENC[AES256_GCM,data:Mww2ow==,iv:IPC3iORKUdmNfw9B9FGUArD8EAQDiHWcl5YrMWsF0X4=,tag:l/+abtj7+e5ecwFz28xcwA==,type:str]
+sops:
+    kms: []
+    gcp_kms:
+    -   resource_id: projects/ss-platform-staging/locations/global/keyRings/ss-key-ring/cryptoKeys/tf-key
+        created_at: '2020-01-09T18:04:18Z'
+        enc: CiQA/jiQ0lAuPR5sMti9CQ/ZnQnkiAXsGlCfUgZoz4WkbsQul8ASSQAA35Lvnt96MqV1Myb/GLJ4GY1RSS5ybI9Pd/o9/gZXtB3isDB3PQy3h3h1ZVCgnAseL/mSD6Miwfw8ZkeU1aNUoXTs1hxa1u4=
+    azure_kv: []
+    lastmodified: '2020-01-09T18:04:19Z'
+    mac: ENC[AES256_GCM,data:/hUtmNRuau6nzW6IfXdDFwJUG7fSx4yOYZue+e8D3NOoql+HjcD8hANdY+3sldm4Ie/pAUIcSLjuTppQSsy4cxga8RY3k1NN+yrYwiWTZuc+TGR/ERo00E5Ru3kec/mXhKkSz6E11ARp7+3QRcPywWXZ8UpscVYHdoYRSzD8VAE=,iv:NJrAfPGBPoBJOKRG7N/2DYcDjDZyvowlP7FBAVplYFg=,tag:gcMbVvifBKDk/ii4aoTEhA==,type:str]
+    pgp: []
+    unencrypted_suffix: _unencrypted
+    version: 3.5.0
